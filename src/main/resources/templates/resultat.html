@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Résultat | Academy</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --gold: #d4af37; --deep-blue: #060c21; --white: #ffffff; --glass: rgba(255, 255, 255, 0.05); --success: #2ecc71; --error: #e74c3c; }
+        
+        body { 
+            margin: 0; font-family: 'Inter', sans-serif; 
+            background: radial-gradient(circle at center, #112240 0%, #060c21 100%); 
+            color: var(--white); min-height: 100vh; 
+            display: flex; flex-direction: column; align-items: center; 
+            padding: 20px; /* Redwi padding sou mobil */
+            box-sizing: border-box;
+        }
+        
+        .result-card { 
+            width: 100%; 
+            max-width: 700px; 
+            background: var(--glass); 
+            padding: 30px 20px; 
+            border-radius: 25px; 
+            border: 1px solid rgba(212, 175, 55, 0.2); 
+            backdrop-filter: blur(15px); 
+            text-align: center; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            box-sizing: border-box;
+        }
+        
+        .score-circle { 
+            width: 130px; height: 130px; 
+            border: 5px solid var(--gold); border-radius: 50%; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            margin: 0 auto 25px; background: rgba(212, 175, 55, 0.05); 
+        }
+        .score-val { font-size: 2.5rem; font-weight: bold; color: var(--gold); }
+        
+        .status-msg { font-size: 1.3rem; margin-bottom: 20px; font-weight: 600; }
+        .success { color: var(--success); }
+        .fail { color: var(--error); }
+
+        
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto; 
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .final-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: rgba(255,255,255,0.02); 
+            min-width: 450px; 
+        }
+        .final-table th { background: var(--gold); color: var(--deep-blue); padding: 12px; font-size: 0.9rem; }
+        .final-table td { padding: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 1rem; }
+
+        
+        .btn-group {
+            display: flex;
+            flex-direction: column; 
+            gap: 15px;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .btn { 
+            width: 100%;
+            max-width: 300px;
+            padding: 15px 25px; 
+            border-radius: 50px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            transition: 0.3s; 
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+        .btn-next { background: var(--gold); color: var(--deep-blue); border: none; }
+        .btn-retry { background: transparent; border: 2px solid var(--gold); color: var(--gold); }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
+
+        
+        @media (min-width: 600px) {
+            .btn-group {
+                flex-direction: row; 
+                justify-content: center;
+            }
+            .btn { width: auto; }
+            .score-circle { width: 150px; height: 150px; }
+            .score-val { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="result-card">
+        <div th:if="${tanDepase}" class="fail" style="margin-bottom: 20px;">
+            <i class="fas fa-clock fa-3x"></i>
+            <h3>TEMPS ÉCOULÉ !</h3>
+            <p>Vous avez mis <span th:text="${tanPran}"></span>s (Limite 200s)</p>
+        </div>
+
+        <div th:unless="${tanDepase}">
+            <div class="score-circle">
+                <span class="score-val" th:text="${score}">0</span>
+                <span style="opacity: 0.5;">/ <span th:text="${total}"></span></span>
+            </div>
+            
+            <div th:class="${aReussi ? 'status-msg success' : 'status-msg fail'}">
+                <i th:class="${aReussi ? 'fas fa-check-circle' : 'fas fa-times-circle'}"></i>
+                <span th:text="${aReussi ? 'NIVEAU RÉUSSI !' : 'NIVEAU ÉCHOUÉ'}"></span>
+            </div>
+        </div>
+
+        <div th:if="${isFinal}">
+            <div style="border-top: 1px solid rgba(212,175,55,0.3); margin-top: 20px; padding-top: 20px;">
+                <h2 style="color: var(--gold); font-size: 1.5rem;">🏆 BILAN DU PARCOURS</h2>
+                
+                <div class="table-responsive">
+                    <table class="final-table">
+                        <thead>
+                            <tr>
+                                <th>Niveau 1</th>
+                                <th>Niveau 2</th>
+                                <th>Niveau 3</th>
+                                <th>MOYENNE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td th:text="${s1} + ' / 20'"></td>
+                                <td th:text="${s2} + ' / 20'"></td>
+                                <td th:text="${s3} + ' / 20'"></td>
+                                <td style="font-weight: bold; color: var(--gold);" th:text="${moyenne} + ' / 20'"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p th:text="${moyenne >= 16 ? 'Félicitations, vous êtes un Expert !' : 'Bravo pour avoir terminé !'}"></p>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <a th:if="${peutPasser}" 
+               th:href="@{'/quiz/' + ${categorieQuiz} + '/' + ${prochainNiveau}}" 
+               class="btn btn-next">
+                Suivant (Niv. <span th:text="${prochainNiveau}"></span>) <i class="fas fa-arrow-right"></i>
+            </a>
+            
+            <a th:if="${!aReussi}" 
+               th:href="@{'/quiz/' + ${categorieQuiz} + '/' + ${niveauActuel}}" 
+               class="btn btn-retry">
+                Réessayer <i class="fas fa-redo"></i>
+            </a>
+
+            <a th:if="${isFinal || (!peutPasser && aReussi)}" 
+               th:href="@{/choix-quiz}" 
+               class="btn btn-retry">
+                Retour Menu
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

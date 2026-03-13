@@ -4,11 +4,9 @@ WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
 
-# Etap 2: Lanse aplikasyon an ak Java
-FROM openjdk:17-jdk-slim
+# Etap 2: Lanse aplikasyon an ak Java (Nou chanje imaj sa a)
+FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
-# Kopi fichye .jar ki fenk fèt la
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-# Lanse aplikasyon an
 ENTRYPOINT ["java", "-jar", "app.jar"]
